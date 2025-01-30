@@ -1,13 +1,13 @@
 import streamlit as st
 from langchain_ollama import ChatOllama
 from langchain_core.output_parsers import StrOutputParser
-
 from langchain_core.prompts import (
     SystemMessagePromptTemplate,
     HumanMessagePromptTemplate,
     AIMessagePromptTemplate,
     ChatPromptTemplate
 )
+import httpx
 
 # Set the website icon and title
 st.set_page_config(page_title="DeepSeek Code Companion", page_icon="🧠")
@@ -93,11 +93,22 @@ with st.sidebar:
     st.markdown("Built with [Ollama](https://ollama.ai/) | [LangChain](https://python.langchain.com/)")
 
 # initiate the chat engine
-llm_engine = ChatOllama(
-    model=selected_model,
-    base_url="https://your-public-api-endpoint.com",
-    temperature=0.3
-)
+def initialize_chat_engine():
+    try:
+        llm_engine = ChatOllama(
+            model=selected_model,
+            base_url="https://your-public-api-endpoint.com",  # Replace with your correct URL
+            temperature=0.3
+        )
+        return llm_engine
+    except httpx.ConnectError as e:
+        st.error(f"Failed to connect to the model server: {str(e)}. Please check the server status or URL.")
+        return None
+
+# Initialize the LLM engine
+llm_engine = initialize_chat_engine()
+if llm_engine is None:
+    st.stop()  # Stop execution if engine initialization fails
 
 # System prompt configuration
 system_prompt = SystemMessagePromptTemplate.from_template(
@@ -122,8 +133,13 @@ with chat_container:
 user_query = st.chat_input("Type your coding question here...")
 
 def generate_ai_response(prompt_chain):
-    processing_pipeline = prompt_chain | llm_engine | StrOutputParser()
-    return processing_pipeline.invoke({})
+    try:
+        processing_pipeline = prompt_chain | llm_engine | StrOutputParser()
+        return processing_pipeline.invoke({})
+    except httpx.RequestError as e:
+        st.error(f"An error occurred during request: {str(e)}")
+    except Exception as e:
+        st.error(f"Unexpected error: {str(e)}")
 
 def build_prompt_chain():
     prompt_sequence = [system_prompt]
@@ -143,8 +159,9 @@ if user_query:
         prompt_chain = build_prompt_chain()
         ai_response = generate_ai_response(prompt_chain)
     
-    # Add AI response to log
-    st.session_state.message_log.append({"role": "ai", "content": ai_response})
+    if ai_response:
+        # Add AI response to log
+        st.session_state.message_log.append({"role": "ai", "content": ai_response})
     
     # Rerun to update chat display
     st.rerun()
