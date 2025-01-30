@@ -97,7 +97,7 @@ def initialize_chat_engine():
     try:
         llm_engine = ChatOllama(
             model=selected_model,
-            base_url="https://your-public-api-endpoint.com",  # Replace with your correct URL
+            base_url="https://gen-ai-with-deep-seek-r1-fzb2jah3ukz7d2xwrc9fed.streamlit.app/",  # Replace with your correct URL
             temperature=0.3
         )
         return llm_engine
