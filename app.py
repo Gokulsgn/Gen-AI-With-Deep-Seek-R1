@@ -95,7 +95,7 @@ with st.sidebar:
 # initiate the chat engine
 llm_engine = ChatOllama(
     model=selected_model,
-    base_url="https://gen-ai-with-deep-seek-r1-fzb2jah3ukz7d2xwrc9fed.streamlit.app/",
+    base_url="https://your-public-api-endpoint.com",
     temperature=0.3
 )
 
