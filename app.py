@@ -92,12 +92,12 @@ with st.sidebar:
     st.divider()
     st.markdown("Built with [Ollama](https://ollama.ai/) | [LangChain](https://python.langchain.com/)")
 
-# initiate the chat engine
+# Function to initialize the chat engine
 def initialize_chat_engine():
     try:
         llm_engine = ChatOllama(
             model=selected_model,
-            base_url="https://gen-ai-with-deep-seek-r1-fzb2jah3ukz7d2xwrc9fed.streamlit.app/",  # Replace with your correct URL
+            base_url="https://your-model-api-endpoint.com",  # Replace with actual model API URL
             temperature=0.3
         )
         return llm_engine
@@ -136,12 +136,16 @@ def generate_ai_response(prompt_chain):
     try:
         processing_pipeline = prompt_chain | llm_engine | StrOutputParser()
         response = processing_pipeline.invoke({})
-        st.write(f"AI Response: {response}")  # Debug: Check the response content
+        if not response:  # If response is empty or None
+            st.error("AI response is empty. Please check the model server.")
+            return "I'm sorry, I couldn't generate a response."
         return response
     except httpx.RequestError as e:
         st.error(f"An error occurred during request: {str(e)}")
+        return "There was an error with the request. Please try again later."
     except Exception as e:
         st.error(f"Unexpected error: {str(e)}")
+        return "An unexpected error occurred. Please try again later."
 
 def build_prompt_chain():
     prompt_sequence = [system_prompt]
@@ -152,7 +156,8 @@ def build_prompt_chain():
             prompt_sequence.append(AIMessagePromptTemplate.from_template(msg["content"]))
     return ChatPromptTemplate.from_messages(prompt_sequence)
 
-if user_query:
+# Handle user query
+if user_query.strip():  # Ensure the input is not empty
     # Add user message to log
     st.session_state.message_log.append({"role": "user", "content": user_query})
     
@@ -167,3 +172,5 @@ if user_query:
     
     # Rerun to update chat display
     st.rerun()
+else:
+    st.warning("Please type a valid question.")
