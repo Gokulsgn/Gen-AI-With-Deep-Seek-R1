@@ -97,7 +97,7 @@ def initialize_chat_engine():
     try:
         llm_engine = ChatOllama(
             model=selected_model,
-            base_url="https://gen-ai-with-deep-seek-r1-fzb2jah3ukz7d2xwrc9fed.streamlit.app/",  # Replace with your correct URL
+            base_url="https://your-public-api-endpoint.com",  # Replace with your correct URL
             temperature=0.3
         )
         return llm_engine
@@ -135,7 +135,9 @@ user_query = st.chat_input("Type your coding question here...")
 def generate_ai_response(prompt_chain):
     try:
         processing_pipeline = prompt_chain | llm_engine | StrOutputParser()
-        return processing_pipeline.invoke({})
+        response = processing_pipeline.invoke({})
+        st.write(f"AI Response: {response}")  # Debug: Check the response content
+        return response
     except httpx.RequestError as e:
         st.error(f"An error occurred during request: {str(e)}")
     except Exception as e:
