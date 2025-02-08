@@ -70,13 +70,12 @@ with st.sidebar:
 
 # initiate the chat engine
 
-llm_engine=ChatOllama(
+llm_engine = ChatOllama(
     model=selected_model,
-    base_url="http://localhost:11434",
-
+    base_url="http://localhost:11500",
     temperature=0.3
-
 )
+
 
 # System prompt configuration
 system_prompt = SystemMessagePromptTemplate.from_template(
@@ -125,5 +124,5 @@ if user_query:
     # Add AI response to log
     st.session_state.message_log.append({"role": "ai", "content": ai_response})
     
-    # Rerun to update chat display
+    # Rerun to update chat displa
     st.rerun()
