@@ -8,10 +8,6 @@ from langchain_core.prompts import (
     AIMessagePromptTemplate,
     ChatPromptTemplate
 )
-
-# Set the website icon and title
-st.set_page_config(page_title="DeepSeek Code Companion", page_icon="🧠")
-
 # Custom CSS styling
 st.markdown("""
 <style>
@@ -26,50 +22,29 @@ st.markdown("""
     .stTextInput textarea {
         color: #ffffff !important;
     }
-
+    
     /* Add these new styles for select box */
     .stSelectbox div[data-baseweb="select"] {
         color: white !important;
         background-color: #3d3d3d !important;
     }
-
+    
     .stSelectbox svg {
         fill: white !important;
     }
-
+    
     .stSelectbox option {
         background-color: #2d2d2d !important;
         color: white !important;
     }
-
+    
     /* For dropdown menu items */
     div[role="listbox"] div {
         background-color: #2d2d2d !important;
         color: white !important;
     }
-
-    /* Title color change */
-    h1 {
-        color: #ff8c00 !important;
-    }
-
-    /* No color change for other elements */
-    .stMarkdown {
-        color: black !important;
-    }
-    
-    /* For buttons */
-    .stButton button {
-        background-color: #ff8c00 !important;
-        color: white !important;
-    }
-
-    .stButton:hover button {
-        background-color: #cc7a00 !important;
-    }
 </style>
 """, unsafe_allow_html=True)
-
 st.title("🧠 DeepSeek Code Companion")
 st.caption("🚀 Your AI Pair Programmer with Debugging Superpowers")
 
@@ -92,11 +67,15 @@ with st.sidebar:
     st.divider()
     st.markdown("Built with [Ollama](https://ollama.ai/) | [LangChain](https://python.langchain.com/)")
 
+
 # initiate the chat engine
-llm_engine = ChatOllama(
+
+llm_engine=ChatOllama(
     model=selected_model,
-    base_url="https://gen-ai-with-deep-seek-r1-fzb2jah3ukz7d2xwrc9fed.streamlit.app",
+    base_url="http://localhost:11434",
+
     temperature=0.3
+
 )
 
 # System prompt configuration
@@ -122,7 +101,7 @@ with chat_container:
 user_query = st.chat_input("Type your coding question here...")
 
 def generate_ai_response(prompt_chain):
-    processing_pipeline = prompt_chain | llm_engine | StrOutputParser()
+    processing_pipeline=prompt_chain | llm_engine | StrOutputParser()
     return processing_pipeline.invoke({})
 
 def build_prompt_chain():
